@@ -1,11 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-// Importing the controllers:
-const { getQuestions, postQuestions } = require('../controllers/Questions');
+const { toggleLikeQuestion } = require("../controllers/LikeController");
+const { createComment } = require("../controllers/CommentController");
+const { createQuestion, getAllQuestions } = require("../controllers/QuestionController");
 
-// Mounting the controllers:
-router.get('/get-questions', getQuestions);
-router.post('/post-question', postQuestions);
+router.post("/create-comment", createComment);
+router.post("/create-ques", createQuestion);
+router.get("/get-ques", getAllQuestions);
+router.post("/question-like", toggleLikeQuestion);
 
 module.exports = router;
