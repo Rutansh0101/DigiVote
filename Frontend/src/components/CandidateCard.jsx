@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import CandidateDetails from './CandidateDetails';
 
-const CandidateCard = ({ name, description, imageUrl, isPixelArt }) => {
+const CandidateCard = ({ name, description, party, isPixelArt, ElectionSymbol, CurrentPartyPresident, KeyLeaders, Presence }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -15,14 +15,14 @@ const CandidateCard = ({ name, description, imageUrl, isPixelArt }) => {
             {isPixelArt ? (
               <div className={`w-full h-full`}>
                 <img 
-                  src={imageUrl} 
+                  src={party} 
                   alt={name}
                   className="w-full h-full object-cover"
                 />
               </div>
             ) : (
               <img 
-                src={imageUrl} 
+                src={party} 
                 alt={name}
                 className="w-full h-full object-cover rounded-lg"
               />
@@ -38,7 +38,13 @@ const CandidateCard = ({ name, description, imageUrl, isPixelArt }) => {
       <CandidateDetails 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        candidate={{ name, description, imageUrl }}
+        name={name}
+        status={description}
+        party={party}
+        ElectionSymbol = {ElectionSymbol}
+        CurrentPartyPresident = {CurrentPartyPresident}
+        KeyLeaders = {KeyLeaders}
+        Presence = {Presence}
       />
     </>
   );

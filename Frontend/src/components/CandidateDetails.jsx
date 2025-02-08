@@ -1,11 +1,13 @@
 import { gsap } from 'gsap';
 import { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../LanguageContext';
 
-const CandidateDetails = ({ isOpen, onClose, name, status, imageUrl }) => {
+const CandidateDetails = ({ isOpen, onClose, name, status, party, ElectionSymbol , CurrentPartyPresident, KeyLeaders, Presence}) => {
     const modalRef = useRef(null);
     const contentRef = useRef(null);
     const [isClosing, setIsClosing] = useState(false);
-    
+    const { language } = useLanguage();
+
     useEffect(() => {
       if (isOpen) {
         setIsClosing(false);
@@ -19,7 +21,7 @@ const CandidateDetails = ({ isOpen, onClose, name, status, imageUrl }) => {
             duration: 0.3,
           }
         );
-  
+
         // Animate content
         gsap.fromTo(contentRef.current,
           {
@@ -35,7 +37,7 @@ const CandidateDetails = ({ isOpen, onClose, name, status, imageUrl }) => {
         );
       }
     }, [isOpen]);
-  
+
     const handleClose = () => {
       setIsClosing(true);
       
@@ -45,7 +47,7 @@ const CandidateDetails = ({ isOpen, onClose, name, status, imageUrl }) => {
         opacity: 0,
         duration: 0.3
       });
-  
+
       // Animate modal out
       gsap.to(modalRef.current, {
         opacity: 0,
@@ -54,9 +56,9 @@ const CandidateDetails = ({ isOpen, onClose, name, status, imageUrl }) => {
         onComplete: onClose
       });
     };
-  
+
     if (!isOpen) return null;
-  
+
     return (
       <div 
         ref={modalRef}
@@ -81,7 +83,7 @@ const CandidateDetails = ({ isOpen, onClose, name, status, imageUrl }) => {
           >
             ✕
           </button>
-  
+
           <div className="h-full overflow-auto p-8 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <style>
               {`
@@ -97,7 +99,7 @@ const CandidateDetails = ({ isOpen, onClose, name, status, imageUrl }) => {
             <div className="flex gap-8 mb-8">
               <div className="w-40 h-40 overflow-hidden rounded-lg flex-shrink-0">
                 <img 
-                  src={imageUrl}
+                  src={party}
                   alt={name}
                   className="w-full h-full object-cover"
                 />
@@ -106,18 +108,29 @@ const CandidateDetails = ({ isOpen, onClose, name, status, imageUrl }) => {
                 <h2 className="text-3xl font-bold text-gray-600 mb-3">{name}</h2>
               </div>
             </div>
-  
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-white mb-3">About</h3>
-              <p className="text-gray-400 text-lg leading-relaxed">
+
+            <div className="flex flex-col gap-4">
+              <h3 className="text-xl font-semibold text-gray-600 mb-3">{language === 'en' ? 'About' : 'के बारे में'}</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
                 {status}
               </p>
+              <div className='text-xl font-bold text-gray-600 mb-3'>
+                ElectionSymbol : {ElectionSymbol}
+              </div>
+              <div className='text-xl font-bold text-gray-600 mb-3'>
+                CurrentPartyPresident : {CurrentPartyPresident}
+              </div>
+              <div className='text-xl font-bold text-gray-600 mb-3'>
+                KeyLeaders : {KeyLeaders}
+              </div>
+              <div className='text-xl font-bold text-gray-600 mb-3'>
+                Presence : {Presence}
+              </div>
             </div>
           </div>
         </div>
       </div>
     );
-  };
-
+};
 
 export default CandidateDetails;

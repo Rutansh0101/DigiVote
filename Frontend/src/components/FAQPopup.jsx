@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, ThumbsUp, Send } from 'lucide-react';
 import { gsap } from 'gsap';
 import axios from 'axios';
+import { useLanguage } from '../LanguageContext';
 
 const FAQPopup = ({ isOpen, onClose }) => {
   const [questions, setQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [newReply, setNewReply] = useState({});
   const [showAllReplies, setShowAllReplies] = useState({});
+  const { language } = useLanguage();
 
   const popupRef = useRef(null);
   const backgroundRef = useRef(null);
@@ -135,7 +137,7 @@ const FAQPopup = ({ isOpen, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-2xl font-bold">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold">{language === 'en' ? 'Frequently Asked Questions' : 'अक्सर पूछे जाने वाले प्रश्न'}</h2>
           <button
             onClick={onClose}
             className="text-gray-600 hover:text-gray-900 transition-colors hover:bg-red-300 p-2 rounded-full animate-pulse"
@@ -150,7 +152,7 @@ const FAQPopup = ({ isOpen, onClose }) => {
               type="text"
               value={newQuestion}
               onChange={(e) => setNewQuestion(e.target.value)}
-              placeholder="Ask a new question"
+              placeholder={language === 'en' ? 'Ask a new question' : 'एक नया प्रश्न पूछें'}
               className="flex-grow border rounded-lg p-2"
             />
             <button
@@ -165,7 +167,7 @@ const FAQPopup = ({ isOpen, onClose }) => {
         {
           questions.length === 0 ? (
             <div className="p-6 text-center text-gray-600">
-              No questions yet. Be the first to ask!
+              {language === 'en' ? 'No questions yet. Be the first to ask!' : 'अभी तक कोई प्रश्न नहीं है। सबसे पहले पूछें!'}
             </div>
           ) : (
             <div className="p-6 space-y-6">
@@ -196,7 +198,7 @@ const FAQPopup = ({ isOpen, onClose }) => {
                       onClick={() => toggleShowAllReplies(q._id)}
                       className="text-blue-500 mt-2"
                     >
-                      {showAllReplies[q._id] ? 'Show Less' : 'Show More'}
+                      {showAllReplies[q._id] ? (language === 'en' ? 'Show Less' : 'कम दिखाएं') : (language === 'en' ? 'Show More' : 'और दिखाएं')}
                     </button>
                   )}
 
@@ -208,7 +210,7 @@ const FAQPopup = ({ isOpen, onClose }) => {
                         ...prev,
                         [q._id]: e.target.value
                       }))}
-                      placeholder="Add a reply"
+                      placeholder={language === 'en' ? 'Add a reply' : 'एक उत्तर जोड़ें'}
                       className="flex-grow border rounded-lg p-2"
                     />
                     <button
