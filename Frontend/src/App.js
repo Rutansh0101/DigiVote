@@ -8,6 +8,8 @@ import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
 import ElectionAdmin from "./pages/ElectionAdmin"
 import BotPressChat from "./components/BotPressChat"
+import About from "./pages/About"
+import Contact from "./pages/Contact"
 
 function App() {
 
@@ -25,6 +27,8 @@ function App() {
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/parties" element={<Contestants />} />
         <Route path='/admin-dashboard' element={<div><ElectionAdmin/></div>}/>
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
       <div>
         <BotPressChat/>
@@ -37,4 +41,4 @@ function App() {
   )
 }
 
-export default App;
+export default App;
