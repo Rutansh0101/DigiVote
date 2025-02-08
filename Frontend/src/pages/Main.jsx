@@ -25,7 +25,7 @@ const Main = () => {
     en: {
       welcome: "Welcome to DigiVote India",
       empowering: "Empowering Democracy, One Click at a Time!",
-      description: "Voting is the cornerstone of a thriving democracy...",
+      description: "Voting is the cornerstone of a thriving democracy, ensuring that every citizen has a voice in shaping the nation’s future. As India continues to grow as the world’s largest democracy, it is crucial to make the electoral process secure, transparent, and accessible to all. DigiVote is a next-generation online voting platform designed to enhance electoral participation, streamline voting procedures, and eliminate fraud. By integrating advanced security measures, we aim to provide a fair, efficient, and reliable voting system for all eligible voters, including those in remote areas, overseas, and underserved communities",
       voterEducation: "Voter Education",
       knowYourRights: "Know Your Rights",
       rightsDescription: "Learn about your voting rights...",
@@ -56,16 +56,16 @@ const Main = () => {
         "Track election results and verify your vote."
       ],
       about: "India International Institute of Democracy...",
-      aboutDescription1: "The Election Commission of India (ECI)...",
-      aboutDescription2: "The management of elections has become complex...",
+      aboutDescription1: "The Election Commission of India (ECI), established the India International Institute of Democracy and Election Management (IIIDEM) to advance its professional competence in election management, promote peoples participation, contribute to developing stronger democratic institutions and support the efforts of ECI in carrying out its mandate and functions.",
+      aboutDescription2: "Over the last six decades, the structure and functions of the Election Commission have undergone major changes and thus the management of elections has become increasingly complex. A rapid transformation in social context and reality, rising number of political parties, changing dynamics and demands of coalitions and alliances, frequent elections and bye-elections, increase in number of eligible voters and continuous updating of electoral rolls have led to new challenges for election management bodies of today.",
       platform: "Secure Digital Democracy Platform",
-      platformDescription1: "DigiVote is India's pioneering blockchain...",
-      platformDescription2: "Our platform features advanced encryption...",
+      platformDescription1: "DigiVote is India's pioneering blockchain-based digital voting system designed to ensure transparency, security, and trust in the electoral process. By leveraging decentralized ledger technology, DigiVote eliminates risks like voter fraud, data manipulation, and unauthorized access.",
+      platformDescription2: "Our platform features advanced encryption protocols that safeguard voter identities and ensure that every vote cast remains anonymous and tamper-proof. With real-time verification and auditability, DigiVote provides a seamless, reliable, and corruption-free voting experience for citizens.",
     },
     hi: {
       welcome: "डिजीवोट इंडिया में आपका स्वागत है",
       empowering: "लोकतंत्र को सशक्त बनाना, एक क्लिक में!",
-      description: "मतदान एक समृद्ध लोकतंत्र का आधार है...",
+      description: "मतदान एक सफल लोकतंत्र की नींव है, यह सुनिश्चित करता है कि प्रत्येक नागरिक के पास राष्ट्र के भविष्य को आकार देने में एक आवाज हो। जैसे-जैसे भारत दुनिया के सबसे बड़े लोकतंत्र के रूप में बढ़ता है, यह आवश्यक है कि चुनावी प्रक्रिया को सुरक्षित, पारदर्शी और सभी के लिए सुलभ बनाया जाए। डिजीवोट एक अगली पीढ़ी का ऑनलाइन मतदान मंच है जिसे चुनावी भागीदारी को बढ़ाने, मतदान प्रक्रियाओं को सरल बनाने और धोखाधड़ी को समाप्त करने के लिए डिज़ाइन किया गया है। उन्नत सुरक्षा उपायों को एकीकृत करके, हम सभी योग्य मतदाताओं के लिए एक निष्पक्ष, कुशल और विश्वसनीय मतदान प्रणाली प्रदान करने का लक्ष्य रखते हैं, जिसमें दूरदराज के क्षेत्रों, विदेशों में और underserved समुदायों के लोग शामिल हैं।",
       voterEducation: "मतदाता शिक्षा",
       knowYourRights: "अपने अधिकार जानें",
       rightsDescription: "भारतीय नागरिक के रूप में अपने मतदान अधिकारों...",
@@ -96,11 +96,11 @@ const Main = () => {
         "मतदान के बाद, आप चुनाव परिणामों को ट्रैक कर सकते हैं..."
       ],
       about: "भारत अंतर्राष्ट्रीय लोकतंत्र और चुनाव प्रबंधन संस्थान",
-      aboutDescription1: "भारत के चुनाव आयोग ने चुनाव प्रबंधन में...",
-      aboutDescription2: "पिछले छह दशकों में, चुनाव आयोग की संरचना...",
+      aboutDescription1: "भारत के चुनाव आयोग (ईसीआई) ने चुनाव प्रबंधन में अपनी पेशेवर क्षमता को बढ़ाने, लोगों की भागीदारी को बढ़ावा देने, मजबूत लोकतांत्रिक संस्थानों के विकास में योगदान करने और अपने जनादेश और कार्यों को पूरा करने में ईसीआई के प्रयासों का समर्थन करने के लिए भारत अंतर्राष्ट्रीय लोकतंत्र और चुनाव प्रबंधन संस्थान (आईआईआईडीईएम) की स्थापना की।",
+      aboutDescription2: "पिछले छह दशकों में, चुनाव आयोग की संरचना और कार्यों में बड़े बदलाव हुए हैं और इस प्रकार चुनावों का प्रबंधन increasingly जटिल हो गया है। सामाजिक संदर्भ और वास्तविकता में तेजी से परिवर्तन, राजनीतिक दलों की बढ़ती संख्या, गठबंधनों और सहयोगों की बदलती गतिशीलता और मांगें, बार-बार चुनाव और उपचुनाव, योग्य मतदाताओं की संख्या में वृद्धि और चुनावी सूची का निरंतर अद्यतन आज के चुनाव प्रबंधन निकायों के लिए नए चुनौतियों का कारण बने हैं।",
       platform: "सुरक्षित डिजिटल लोकतंत्र मंच",
-      platformDescription1: "डिजीवोट भारत का अग्रणी ब्लॉकचेन-आधारित...",
-      platformDescription2: "हमारे मंच में उन्नत एन्क्रिप्शन, बहु-कारक...",
+      platformDescription1: "डिजीवोट भारत का अग्रणी ब्लॉकचेन-आधारित डिजिटल मतदान प्रणाली है, जिसे चुनाव प्रक्रिया में पारदर्शिता, सुरक्षा और विश्वास सुनिश्चित करने के लिए डिज़ाइन किया गया है। यह विकेंद्रीकृत लेजर तकनीक का उपयोग करता है, जिससे मतदाता धोखाधड़ी, डेटा में हेरफेर और अनधिकृत पहुंच जैसी समस्याओं को समाप्त किया जा सकता है।",
+      platformDescription2: "हमारे प्लेटफ़ॉर्म में उन्नत एन्क्रिप्शन प्रोटोकॉल शामिल हैं, जो मतदाताओं की पहचान की सुरक्षा करते हैं और डाले गए प्रत्येक वोट को गुप्त एवं छेड़छाड़-सबूत बनाते हैं। रीयल-टाइम सत्यापन और ऑडिटिंग की क्षमता के साथ, DigiVote नागरिकों के लिए एक निर्बाध, विश्वसनीय और भ्रष्टाचार-मुक्त मतदान अनुभव प्रदान करता है।",
     }
   };
 

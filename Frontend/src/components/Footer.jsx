@@ -47,8 +47,7 @@ const Footer = () => {
                       <Link to='/parties' className='list-item tracking-wide'>{language === 'en' ? 'Parties' : 'पार्टियां'}</Link>
                       <Link to='/vote' className='list-item tracking-wide'>{language === 'en' ? 'Vote Now' : 'अभी वोट करें'}</Link>
                       <Link to='/results' className='list-item tracking-wide'>{language === 'en' ? 'Results' : 'परिणाम'}</Link>
-                      <Link to='/survey' className='list-item tracking-wide'>{language === 'en' ? 'Survey' : 'सर्वेक्षण'}</Link>
-                      <Link to='/survey' className='list-item tracking-wide'>{language === 'en' ? 'Resources' : 'संसाधन'}</Link>
+                      <Link to='/about' className='list-item tracking-wide'>{language === 'en' ? 'Resources' : 'संसाधन'}</Link>
                   </div>
                   <div className='flex flex-col gap-1 text-sm text-[#ace8fe] marker:text-[#00aeef]'>
                       <Link to='/' className='list-item tracking-wide'>{language === 'en' ? 'About ECI' : 'ईसीआई के बारे में'}</Link>
