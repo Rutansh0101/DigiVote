@@ -7,6 +7,7 @@ import Contestants from "./pages/Contestants"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
 import ElectionAdmin from "./pages/ElectionAdmin"
+import BotPressChat from "./components/BotPressChat"
 
 function App() {
 
@@ -25,6 +26,9 @@ function App() {
         <Route path="/parties" element={<Contestants />} />
         <Route path='/admin-dashboard' element={<div><ElectionAdmin/></div>}/>
       </Routes>
+      <div>
+        <BotPressChat/>
+      </div>
     {
       !location.pathname.includes('admin-dashboard') &&
       <Footer/>

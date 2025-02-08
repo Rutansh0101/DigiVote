@@ -106,7 +106,7 @@ const Main = () => {
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <div className="flex-grow mx-5 px-4 py-8">
-        <div className='flex mb-10 bg-white rounded-xl justify-around h-[600px] items-center'>
+        <div className='flex mb-10 h-fit bg-white rounded-xl justify-around min-h-[600px] items-center'>
           <div className='p-6 flex flex-col w-[50%] h-full justify-center'>
             <h1 className="text-6xl font-bold mb-4 text-gray-700">{text[language].welcome}</h1>
             <p className="text-lg mb-3 font-medium text-gray-600">{text[language].empowering}</p>
