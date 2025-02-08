@@ -1,29 +1,60 @@
-import React, { useState } from 'react';
-import { Shield, UserPlus, Play, Square, Users, LogOut, Activity, Image as ImageIcon, ThumbsUp } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { BrowserProvider, Contract } from "ethers";
+import { Shield, UserPlus, Play, Square, Users, LogOut, Activity, Image as ImageIcon } from 'lucide-react';
+import ElectionABI from "../artifacts/contracts/voting.sol/Election.json";
 
-const ADMIN_CREDENTIALS = {
-  username: 'admin',
-  password: 'admin123',
-  isAdmin: true,
-};
-
-function ElectionAdmin() {
+const ElectionAdmin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [electionState, setElectionState] = useState({
-    isActive: false,
-    candidates: [],
-  });
-  const [newCandidate, setNewCandidate] = useState({ 
-    name: '', 
-    party: '', 
-    description: '',
-    photoUrl: '',
-    partyLogoUrl: ''
-  });
   const [error, setError] = useState('');
-  const [votedUsers, setVotedUsers] = useState([]);
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [candidates, setCandidates] = useState([]);
+  const [electionActive, setElectionActive] = useState(false);
+  const [newCandidate, setNewCandidate] = useState({
+    name: "",
+    party: "",
+    description: "",
+    photoUrl: "",
+    partyLogoUrl: "",
+  });
+
+  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const ADMIN_CREDENTIALS = {
+    username: 'admin',
+    password: 'admin123',
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      loadBlockchainData();
+    }
+  }, [isLoggedIn]);
+
+  const loadBlockchainData = async () => {
+    if (!window.ethereum) {
+      setError("Please install MetaMask");
+      return;
+    }
+
+    try {
+      const provider = new BrowserProvider(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      const signer = await provider.getSigner();
+      const contract = new Contract(contractAddress, ElectionABI.abi, signer);
+
+      setProvider(provider);
+      setSigner(signer);
+      setContract(contract);
+
+      fetchElectionStatus(contract);
+      fetchCandidates(contract);
+    } catch (error) {
+      setError("Error loading blockchain data: " + error.message);
+    }
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -35,87 +66,80 @@ function ElectionAdmin() {
     }
   };
 
-  const handleAddCandidate = (e) => {
-    e.preventDefault();
-    if (newCandidate.name && newCandidate.party) {
-      setElectionState(prev => ({
-        ...prev,
-        candidates: [...prev.candidates, {
-          id: Date.now().toString(),
-          ...newCandidate,
-          votes: 0
-        }]
-      }));
-      setNewCandidate({ name: '', party: '', description: '', photoUrl: '', partyLogoUrl: '' });
+  const fetchElectionStatus = async (contract) => {
+    if (!contract) return;
+    try {
+      const status = await contract.electionActive();
+      setElectionActive(status);
+    } catch (error) {
+      setError("Error fetching election status: " + error.message);
+    }
+  };
+
+  const fetchCandidates = async (contract) => {
+    if (!contract) return;
+    try {
+      const count = await contract.candidateCount();
+      let candidatesArray = [];
+      for (let i = 1; i <= count; i++) {
+        const candidate = await contract.candidates(i);
+        candidatesArray.push(candidate);
+      }
+      setCandidates(candidatesArray);
+    } catch (error) {
+      setError("Error fetching candidates: " + error.message);
+    }
+  };
+
+  const startElection = async () => {
+    if (!contract) return;
+    try {
+      const tx = await contract.startElection();
+      await tx.wait();
+      setElectionActive(true);
       setError('');
+    } catch (error) {
+      setError("Error starting election: " + error.message);
     }
   };
 
-  const handleVote = (candidateId) => {
-    if (!electionState.isActive) {
-      setError('Voting is currently closed');
+  const stopElection = async () => {
+    if (!contract) return;
+    try {
+      const tx = await contract.stopElection();
+      await tx.wait();
+      setElectionActive(false);
+      setError('');
+    } catch (error) {
+      setError("Error stopping election: " + error.message);
+    }
+  };
+
+  const handleAddCandidate = async (e) => {
+    e.preventDefault();
+    if (!contract) return;
+    
+    const { name, party, description, photoUrl, partyLogoUrl } = newCandidate;
+    if (!name || !party || !description || !photoUrl || !partyLogoUrl) {
+      setError("Please fill all candidate details!");
       return;
     }
 
-    if (votedUsers.includes(username)) {
-      setError('You have already voted');
-      return;
+    try {
+      const tx = await contract.addCandidate(name, party, description, photoUrl, partyLogoUrl);
+      await tx.wait();
+      fetchCandidates(contract);
+      setNewCandidate({ name: "", party: "", description: "", photoUrl: "", partyLogoUrl: "" });
+      setError('');
+    } catch (error) {
+      setError("Error adding candidate: " + error.message);
     }
-
-    setElectionState(prev => ({
-      ...prev,
-      candidates: prev.candidates.map(candidate => 
-        candidate.id === candidateId 
-          ? { ...candidate, votes: (candidate.votes || 0) + 1 }
-          : candidate
-      )
-    }));
-    setVotedUsers([...votedUsers, username]);
-    setError('');
-  };
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewCandidate(prev => ({ ...prev, photoUrl: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handlePartyLogoChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewCandidate(prev => ({ ...prev, partyLogoUrl: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const toggleElection = () => {
-    setElectionState(prev => ({
-      ...prev,
-      isActive: !prev.isActive
-    }));
-    setVotedUsers([]); // Reset the voted users when toggling the election state
   };
 
   if (!isLoggedIn) {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?ixlib=rb-1.2.1&auto=format&fit=crop&w=2850&q=80')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-        <div className="relative bg-white/95 p-8 rounded-2xl shadow-2xl w-[400px] backdrop-blur-lg">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="bg-white/95 p-8 rounded-2xl shadow-2xl w-96">
           <div className="flex flex-col items-center justify-center mb-8">
             <Shield className="w-16 h-16 text-blue-600" />
             <h2 className="text-3xl font-bold text-gray-800 mt-4">Election Admin</h2>
@@ -133,7 +157,7 @@ function ElectionAdmin() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -143,13 +167,13 @@ function ElectionAdmin() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Sign In
             </button>
@@ -168,19 +192,19 @@ function ElectionAdmin() {
               <Shield className="w-8 h-8 text-blue-600" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Election Admin</h1>
-                <p className="text-sm text-gray-500">Dashboard</p>
+                <p className="text-sm text-gray-500">Blockchain Dashboard</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className={`flex items-center px-3 py-1 rounded-full ${
-                electionState.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                electionActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
               }`}>
                 <Activity className="w-4 h-4 mr-2" />
-                {electionState.isActive ? 'Election Active' : 'Election Inactive'}
+                {electionActive ? 'Election Active' : 'Election Inactive'}
               </div>
               <button
                 onClick={() => setIsLoggedIn(false)}
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
@@ -192,6 +216,12 @@ function ElectionAdmin() {
 
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8">
+          {error && (
+            <div className="bg-red-50 text-red-500 p-4 rounded-lg">
+              {error}
+            </div>
+          )}
+
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="text-white">
@@ -199,14 +229,14 @@ function ElectionAdmin() {
                 <p className="mt-1 text-blue-100">Manage the election state</p>
               </div>
               <button
-                onClick={toggleElection}
-                className={`flex items-center px-6 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  electionState.isActive
+                onClick={electionActive ? stopElection : startElection}
+                className={`flex items-center px-6 py-3 rounded-lg text-sm font-medium ${
+                  electionActive
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : 'bg-white text-blue-600 hover:bg-gray-50'
                 }`}
               >
-                {electionState.isActive ? (
+                {electionActive ? (
                   <>
                     <Square className="w-5 h-5 mr-2" />
                     Stop Election
@@ -239,7 +269,7 @@ function ElectionAdmin() {
                     type="text"
                     value={newCandidate.name}
                     onChange={(e) => setNewCandidate(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
                 </div>
@@ -251,41 +281,9 @@ function ElectionAdmin() {
                     type="text"
                     value={newCandidate.party}
                     onChange={(e) => setNewCandidate(prev => ({ ...prev, party: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Candidate Photo
-                  </label>
-                  <input
-                    type="file"
-                    onChange={handlePhotoChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    required
-                  />
-                  {newCandidate.photoUrl && (
-                    <div className="mt-2">
-                      <img src={newCandidate.photoUrl} alt="candidate" className="w-full h-48 object-cover rounded-lg shadow-md" />
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Party Logo
-                  </label>
-                  <input
-                    type="file"
-                    onChange={handlePartyLogoChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    required
-                  />
-                  {newCandidate.partyLogoUrl && (
-                    <div className="mt-2">
-                      <img src={newCandidate.partyLogoUrl} alt="party logo" className="w-full h-48 object-cover rounded-lg shadow-md" />
-                    </div>
-                  )}
                 </div>
               </div>
               <div>
@@ -296,14 +294,39 @@ function ElectionAdmin() {
                   value={newCandidate.description}
                   onChange={(e) => setNewCandidate(prev => ({ ...prev, description: e.target.value }))}
                   rows={4}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  placeholder="Enter candidate's description..."
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Photo URL
+                  </label>
+                  <input
+                    type="text"
+                    value={newCandidate.photoUrl}
+                    onChange={(e) => setNewCandidate(prev => ({ ...prev, photoUrl: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Party Logo URL
+                  </label>
+                  <input
+                    type="text"
+                    value={newCandidate.partyLogoUrl}
+                    onChange={(e) => setNewCandidate(prev => ({ ...prev, partyLogoUrl: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+              </div>
               <button
                 type="submit"
-                className="inline-flex items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                className="inline-flex items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <UserPlus className="w-5 h-5 mr-2" />
                 Add Candidate
@@ -316,13 +339,13 @@ function ElectionAdmin() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Candidate List</h2>
                 <p className="text-gray-500 mt-1">
-                  {electionState.candidates.length} candidate{electionState.candidates.length !== 1 ? 's' : ''} registered
+                  {candidates.length} candidate{candidates.length !== 1 ? 's' : ''} registered
                 </p>
               </div>
             </div>
             <div className="grid grid-cols-1 gap-6">
-              {electionState.candidates.map((candidate) => (
-                <div key={candidate.id} className="bg-gray-50 rounded-xl p-6">
+              {candidates.map((candidate, index) => (
+                <div key={index} className="bg-gray-50 rounded-xl p-6">
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="w-full md:w-48 flex-shrink-0">
                       {candidate.photoUrl ? (
@@ -335,7 +358,7 @@ function ElectionAdmin() {
                         <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
                           <ImageIcon className="w-12 h-12 text-gray-400" />
                         </div>
-                    )}
+                      )}
                     </div>
                     <div className="flex-grow">
                       <div className="flex items-start justify-between">
@@ -354,21 +377,11 @@ function ElectionAdmin() {
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <div className="text-2xl font-bold text-blue-600">{candidate.votes || 0}</div>
+                            <div className="text-2xl font-bold text-blue-600">
+                              {candidate.voteCount?.toString() || '0'}
+                            </div>
                             <div className="text-sm text-gray-500">votes</div>
                           </div>
-                          <button
-                            onClick={() => handleVote(candidate.id)}
-                            disabled={!electionState.isActive}
-                            className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                              electionState.isActive
-                                ? 'bg-green-600 hover:bg-green-700 text-white'
-                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            }`}
-                          >
-                            <ThumbsUp className="w-4 h-4 mr-2" />
-                            Vote
-                          </button>
                         </div>
                       </div>
                       <p className="mt-4 text-gray-600">{candidate.description}</p>
@@ -376,7 +389,7 @@ function ElectionAdmin() {
                   </div>
                 </div>
               ))}
-              {electionState.candidates.length === 0 && (
+              {candidates.length === 0 && (
                 <div className="text-center py-12">
                   <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500 text-lg">No candidates added yet</p>
@@ -389,6 +402,6 @@ function ElectionAdmin() {
       </main>
     </div>
   );
-}
+};
 
 export default ElectionAdmin;
